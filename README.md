@@ -1,4 +1,5 @@
-<img width="1600" height="900" alt="project" src="https://github.com/user-attachments/assets/2597b07a-1c72-4b7f-aeb8-b985a316b256" />
+<img width="728" height="304" alt="project" src="https://github.com/user-attachments/assets/e876f95a-1ac3-4ddb-ab50-c9a251f03d0c" />
+
 
                                 RESUME SCREENING AND CANDIDATE MATCHER
                                       Project Documentation
