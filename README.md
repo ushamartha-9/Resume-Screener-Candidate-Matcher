@@ -1,301 +1,107 @@
-{
-  "name": "Resume Screening (Manual)",
-  "nodes": [
-    {
-      "parameters": {},
-      "id": "67d5413e-ae76-46b5-a40f-41089912a9a0",
-      "name": "Start",
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
-      "position": [
-        0,
-        112
-      ]
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "i1",
-              "name": "job_description",
-              "value": "Backend Data Engineer: Python, SQL, Docker, 3+ years experience.",
-              "type": "string"
-            },
-            {
-              "id": "i2",
-              "name": "resume_url",
-              "value": "data:text/html,<html><head><title>Akshaya - Python Developer Resume</title></head><body style=\"font-family:Arial;max-width:800px;margin:40px auto;line-height:1.5\"><h1>AKSHAYA</h1><h2>Python Developer</h2><p>Guntur, Andhra Pradesh, India | +91 98765 43210 | akshaya@example.com</p><hr><h2>Professional Summary</h2><p>Motivated and detail-oriented Python Developer with experience developing applications, automation scripts, REST APIs, and database-driven solutions. Skilled in Python, Django, Flask, SQL, Git, and Airtable.</p><h2>Technical Skills</h2><ul><li>Python, SQL, JavaScript</li><li>Django, Flask, FastAPI</li><li>MySQL, PostgreSQL, SQLite</li><li>Git, GitHub, Docker, Postman</li><li>Airtable and Airtable API</li><li>REST API Development</li><li>Python Automation and Data Processing</li></ul><h2>Professional Experience</h2><h3>Python Developer - Tech Solutions Pvt. Ltd.</h3><p>Hyderabad, India | June 2023 - Present</p><ul><li>Developed Python applications and automation scripts.</li><li>Built REST APIs using Flask and FastAPI.</li><li>Worked with MySQL and PostgreSQL databases.</li><li>Integrated Airtable with internal business workflows.</li><li>Created automated data-processing scripts using Python.</li><li>Used Git and GitHub for version control.</li></ul><h3>Junior Python Developer - CodeWorks Technologies</h3><p>Bengaluru, India | July 2021 - May 2023</p><ul><li>Developed Python modules for web applications.</li><li>Created SQL queries and database operations.</li><li>Developed REST APIs using Flask.</li><li>Automated reporting and data-entry tasks.</li><li>Maintained Airtable records and workflows.</li></ul><h2>Projects</h2><h3>Customer Management System</h3><p>Developed a Python-based customer management application using Django and PostgreSQL.</p><h3>Airtable Data Automation System</h3><p>Created a Python automation workflow using the Airtable API to process and synchronize business data.</p><h2>Education</h2><p><b>Bachelor of Technology - Computer Science</b><br>JNTU, Andhra Pradesh | 2017 - 2021<br>CGPA: 8.2/10</p><h2>Certifications</h2><ul><li>Python Programming Certification</li><li>Django Web Development</li><li>SQL and Database Management</li><li>REST API Development</li></ul><h2>Strengths</h2><p>Problem Solving | Logical Thinking | Team Collaboration | Quick Learning | Communication</p><h2>Languages</h2><p>English | Telugu | Hindi</p><h2>Declaration</h2><p>I hereby declare that the information provided above is true and accurate to the best of my knowledge.</p><p><b>Akshaya</b></p></body></html>",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "588d4e8f-578c-4c88-bb8d-dac48f36cb88",
-      "name": "Job Inputs",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        336,
-        112
-      ]
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "t1",
-              "name": "text",
-              "value": "={{ $json.resume_url.replace(/^data:text\\/html,/, \"\").replace(/<(br|\\/p|\\/li|\\/h[1-6]|hr)[^>]*>/gi, \"\\n\").replace(/<[^>]+>/g, \" \").replace(/[ \\t]+/g, \" \").replace(/\\n\\s*/g, \"\\n\").trim() }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "66b94e7e-7146-4cca-9064-0e26f80f385b",
-      "name": "Extract Resume Text",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        672,
-        112
-      ]
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "=Job description:\n{{ $('Job Inputs').item.json.job_description }}\n\nCandidate resume:\n{{ $json.text }}",
-        "hasOutputParser": true,
-        "messages": {
-          "messageValues": [
-            {
-              "message": "You are a recruiting assistant. Compare the resume against the job description. Extract the candidate name, email, phone, total years of experience, all skills, and highest education. matching_skills = skills required by the job that the candidate has; missing_skills = skills required by the job that the candidate lacks. Give a match_score from 0 to 100. recommendation: \"Shortlist\" for score 85+, \"Review\" for 60-84, \"Reject\" below 60. reasoning: 1-3 sentences. Use only facts from the resume; use an empty string or 0 when unknown."
-            }
-          ]
-        },
-        "batching": {}
-      },
-      "id": "d15e58a6-c9e5-4ed1-b024-cd0043e2fb02",
-      "name": "Screen Candidate",
-      "type": "@n8n/n8n-nodes-langchain.chainLlm",
-      "typeVersion": 1.9,
-      "position": [
-        896,
-        112
-      ]
-    },
-    {
-      "parameters": {
-        "model": {
-          "__rl": true,
-          "mode": "list",
-          "value": "gpt-5.4-mini"
-        },
-        "builtInTools": {},
-        "options": {}
-      },
-      "id": "6ffc9a27-8b4f-43c7-b53c-71fe44472391",
-      "name": "Screening Model",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1.3,
-      "position": [
-        896,
-        336
-      ],
-      "credentials": {
-        "openAiApi": {
-          "id": null,
-          "name": "Gateway credits",
-          "__aiGatewayManaged": true
-        }
-      }
-    },
-    {
-      "parameters": {
-        "schemaType": "manual",
-        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"candidate_name\": { \"type\": \"string\" },\n    \"email\": { \"type\": \"string\" },\n    \"phone\": { \"type\": \"string\" },\n    \"years_experience\": { \"type\": \"number\" },\n    \"skills\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } },\n    \"matching_skills\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } },\n    \"missing_skills\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } },\n    \"education\": { \"type\": \"string\" },\n    \"match_score\": { \"type\": \"number\" },\n    \"recommendation\": { \"type\": \"string\", \"enum\": [\"Shortlist\", \"Review\", \"Reject\"] },\n    \"reasoning\": { \"type\": \"string\" }\n  },\n  \"required\": [\"candidate_name\", \"email\", \"phone\", \"years_experience\", \"skills\", \"matching_skills\", \"missing_skills\", \"education\", \"match_score\", \"recommendation\", \"reasoning\"]\n}"
-      },
-      "id": "e4c37440-46e4-450f-a66c-ecae75b5bbfc",
-      "name": "Screening Result Parser",
-      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
-      "typeVersion": 1.3,
-      "position": [
-        1040,
-        336
-      ]
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "f1",
-              "name": "Candidate Name",
-              "value": "={{ $json.output.candidate_name }}",
-              "type": "string"
-            },
-            {
-              "id": "f2",
-              "name": "Email",
-              "value": "={{ $json.output.email }}",
-              "type": "string"
-            },
-            {
-              "id": "f3",
-              "name": "Phone",
-              "value": "={{ $json.output.phone }}",
-              "type": "string"
-            },
-            {
-              "id": "f4",
-              "name": "Years Experience",
-              "value": "={{ $json.output.years_experience }}",
-              "type": "number"
-            },
-            {
-              "id": "f5",
-              "name": "Skills",
-              "value": "={{ ($json.output.skills || []).join(\", \") }}",
-              "type": "string"
-            },
-            {
-              "id": "f6",
-              "name": "Matching Skills",
-              "value": "={{ ($json.output.matching_skills || []).join(\", \") }}",
-              "type": "string"
-            },
-            {
-              "id": "f7",
-              "name": "Missing Skills",
-              "value": "={{ ($json.output.missing_skills || []).join(\", \") }}",
-              "type": "string"
-            },
-            {
-              "id": "f8",
-              "name": "Education",
-              "value": "={{ $json.output.education }}",
-              "type": "string"
-            },
-            {
-              "id": "f9",
-              "name": "Match Score",
-              "value": "={{ $json.output.match_score }}",
-              "type": "number"
-            },
-            {
-              "id": "f10",
-              "name": "Recommendation",
-              "value": "={{ $json.output.recommendation }}",
-              "type": "string"
-            },
-            {
-              "id": "f11",
-              "name": "AI Reasoning",
-              "value": "={{ $json.output.reasoning }}",
-              "type": "string"
-            },
-            {
-              "id": "f12",
-              "name": "Screened At",
-              "value": "={{ $now.toFormat(\"yyyy-MM-dd HH:mm\") }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "7bdd5f28-74d0-4c76-8dfc-01a11f94b7db",
-      "name": "Format Result",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        1248,
-        112
-      ]
-    }
-  ],
-  "pinData": {},
-  "connections": {
-    "Start": {
-      "main": [
-        [
-          {
-            "node": "Job Inputs",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Job Inputs": {
-      "main": [
-        [
-          {
-            "node": "Extract Resume Text",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Extract Resume Text": {
-      "main": [
-        [
-          {
-            "node": "Screen Candidate",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Screen Candidate": {
-      "main": [
-        [
-          {
-            "node": "Format Result",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Screening Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Screen Candidate",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Screening Result Parser": {
-      "ai_outputParser": [
-        [
-          {
-            "node": "Screen Candidate",
-            "type": "ai_outputParser",
-            "index": 0
-          }
-        ]
-      ]
-    }
-  },
-  "active": false,
-  "settings": {
-    "executionOrder": "v1",
-    "binaryMode": "separate"
-  },
-  "versionId": "8bab640a-d455-498f-8729-06a310718db3",
-  "meta": {
-    "instanceId": "f10a941e5915407efad3350cd9aaae78073a8402ae85ac432d6998cbedc9afb7"
-  },
-  "nodeGroups": [],
-  "id": "QXJ1bnELIXMmjsym",
-  "tags": []
-}
+<img width="1600" height="900" alt="project" src="https://github.com/user-attachments/assets/2597b07a-1c72-4b7f-aeb8-b985a316b256" />
+
+                                RESUME SCREENING AND CANDIDATE MATCHER
+                                      Project Documentation
+Built with n8n, AI/LLM, and structured candidate data
+1. Project Overview
+Resume Screening and Candidate Matcher is an AI-powered recruitment automation project that helps recruiters analyze resumes against a job description. The workflow extracts resume information, compares the candidate's skills and experience with the job requirements, and produces a structured screening result.
+2. Problem Statement
+Recruiters may receive a large number of resumes for a single job opening. Manually reading and comparing every resume can take significant time. This project automates the initial screening process so that candidate information can be reviewed in a consistent, structured format.
+3. Objectives
+•	Accept job requirements and candidate resume information.
+•	Extract useful text and candidate details from the resume.
+•	Compare the resume with the job description using an AI/LLM model.
+•	Identify matching skills, experience, and qualifications.
+•	Highlight missing or weakly matched requirements.
+•	Generate a structured screening result for recruiter review.
+•	Reduce repetitive manual work in the initial screening stage.
+4. Workflow
+The n8n workflow can be organized into the following stages:
+Start: Begins the manual resume screening workflow.
+Job Inputs: Collects the job description, required skills, experience, education, and other job requirements.
+Extract Resume Text: Receives or extracts the text/content of the candidate resume so it can be analyzed.
+Screen Candidate: Sends the job requirements and resume information to the AI/LLM for candidate screening.
+Screening Model: The AI model evaluates the relationship between the candidate profile and the job requirements.
+Screening Result Parser: Converts the AI response into a structured result such as match summary, skills, gaps, and recommendation fields.
+Format Result: Formats the final screening output so it is easy to read or store in Airtable/another database.
+5. Candidate Matching Logic
+The screening model should compare the candidate against the job description using factors such as:
+•	Required technical skills
+•	Preferred technical skills
+•	Years and type of relevant experience
+•	Education or certifications
+•	Relevant projects and responsibilities
+•	Keyword and skill alignment
+•	Missing or unclear requirements
+The AI output should be treated as an initial screening aid rather than a final hiring decision. A recruiter should review the resume and the generated result before making employment decisions.
+6. Example Job Description
+Job Title: Junior Software / AI Automation Engineer
+Experience: 0–2 years
+Required Skills: Python, APIs, automation, basic AI/LLM concepts, SQL
+Preferred Skills: n8n, Airtable, GitHub, data processing
+Responsibilities: Build automation workflows, work with APIs, process data, and support AI-based applications.
+7. Example Screening Output
+Field	Example
+Candidate Name	Example Candidate
+Matching Skills	Python, APIs, SQL, automation
+Relevant Experience	1 year software/automation experience
+Missing Skills	n8n experience not clearly shown
+Education	B.Tech / relevant degree
+Match Summary	Resume shows several skills relevant to the job description.
+Recruiter Review	Review resume manually before proceeding.
+8. n8n Workflow Components
+•	Manual Trigger / Start: starts the workflow.
+•	Edit Fields / Set: stores job description and candidate inputs.
+•	Resume Text Extraction: prepares resume text for analysis.
+•	Basic LLM Chain or AI Agent: sends the screening prompt to the selected AI model.
+•	Structured Output Parser: converts the AI response into consistent fields.
+•	Format Result: prepares the final result for display or database storage.
+•	Airtable (optional): stores candidate details and screening results for tracking.
+9. Suggested AI Screening Prompt
+You are a resume screening assistant. Compare the candidate resume with the provided job description. Identify matching skills, relevant experience, missing requirements, and important observations. Return the result in a structured format with: candidate_name, matching_skills, relevant_experience, missing_requirements, education, match_summary, and recruiter_review_notes. Do not invent information that is not present in the resume.
+10. Airtable Data Structure (Optional)
+Column	Purpose
+Candidate Name	Candidate identification
+Email	Candidate contact information, if provided
+Resume Text	Extracted resume content
+Job Title	Position being screened
+Matching Skills	Skills matching the job
+Missing Requirements	Requirements not found or unclear
+Match Summary	AI-generated comparison summary
+Status	Recruiter review status
+11. How to Run the Project
+1.	Open the n8n workflow.
+2.	Enter the job description and candidate resume information in the Job Inputs step.
+3.	Run the workflow manually.
+4.	Allow the resume text extraction step to prepare the candidate information.
+5.	The Screen Candidate step sends the information to the AI/LLM.
+6.	Review the parsed screening result.
+7.	Store the result in Airtable if database tracking is enabled.
+8.	A recruiter reviews the candidate before taking any hiring action.
+12. Benefits
+•	Saves time during initial resume review.
+•	Creates a consistent screening format.
+•	Makes candidate-to-job comparison easier.
+•	Can be connected to Airtable for candidate tracking.
+•	Can be extended to process multiple candidates.
+•	Can be integrated with other recruitment automation workflows.
+13. Limitations and Responsible Use
+•	AI screening can make mistakes or misunderstand resume information.
+•	A missing keyword does not necessarily mean a candidate lacks the skill.
+•	The workflow should not be the sole basis for hiring or rejection decisions.
+•	Recruiters should verify important qualifications directly from the resume and other appropriate sources.
+•	Personal candidate data should be handled securely and only for legitimate recruitment purposes.
+14. Suggested GitHub Repository Structure
+resume-screening-candidate-matcher/
+├── README.md
+├── docs/
+│   └── Project_Documentation.docx
+├── workflow/
+│   └── resume_screening_workflow.json
+├── sample-data/
+│   ├── sample_job_description.txt
+│   └── sample_resume.txt
+└── screenshots/
+    └── n8n_workflow.png
+15. Conclusion
+The Resume Screening and Candidate Matcher demonstrates how n8n and AI can be combined to automate the first stage of resume analysis. The workflow takes job requirements and candidate information, uses an AI model to compare them, structures the result, and can optionally store the output in Airtable. The project can be extended with email notifications, multiple-candidate processing, scoring fields, dashboards, and other recruitment workflow integrations.
